@@ -40,26 +40,6 @@ class QuoteDB < Sinatra::Base
 
     haml :index, :locals => {:quotes => quotes}
   end
-  
-  get '/quote/random' do
-    quotes = Quote.random(params)
-    
-    if request.xhr?
-      content_type :json
-      
-      quotes.to_json
-    else
-      haml :index, :locals => {:quotes => quotes}
-    end
-  end
-
-  get '/quotes/:id' do
-    quote = Quote.find(params[:id])
-    
-    content_type :json
-    
-    quote.attributes.to_json
-  end
 
   get '/quotes' do
     if params[:random]
