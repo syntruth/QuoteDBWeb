@@ -1,0 +1,52 @@
+!!!
+%html
+  %head
+    %title Quote DB Web Interface
+
+    = css :app, :media => 'screen'
+    = js  :app
+	
+  %body
+    #templates{:style => "display: none"}
+      #quote-template
+        %li.quote-row.ui-widget.ui-corner-all
+          .data.ui-widget-header
+            %label ID#
+            = surround "(", ")" do
+              %span.id2
+
+            %label Logged By
+            %span.nick
+
+            %span.timestamp
+				
+          .quote
+
+      #quotes-list-template
+        %ul.list
+
+    #header.ui-widget-header
+      %button.home-btn   Home
+      %button.random-btn Random Quotes
+
+      .limits.ui-widget
+        %label Quote Limits
+
+        .limit
+        
+        .number 1
+
+      %input.term{:name => :term, :type => :text}
+
+      %button.search-btn Search Quotes
+
+    #content
+      = yield
+		
+    #footer.ui-widget-header.ui-corner-top
+      %button.prev-btn Previous
+
+      .page-number 1
+
+      %button.next-btn Next
+	
