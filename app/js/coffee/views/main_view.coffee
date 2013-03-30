@@ -148,15 +148,8 @@ class MainView extends Backbone.View
   setPageNumber: () ->
     @pageNumber.text @pageOptions.page
 
-  hideFooter: () -> @footer.hide 'slide', direction: 'down'
-  showFooter: () -> @footer.show 'slide', direction: 'down'
-
-  handleResize: (e) =>
-    height = $(document).height() - 90
-    
-    @quotesList.height(height)
-    
-    console.log 'Got resize event...', height
-
+  hideFooter:   () -> @footer.hide 'slide', direction: 'down'
+  showFooter:   () -> @footer.show 'slide', direction: 'down'
+  handleResize: () => @quotesList.height($(document).height() - 90)
 
 window.App.Views.MainView = MainView
