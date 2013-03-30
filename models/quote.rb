@@ -11,13 +11,14 @@ class Quote
   def self.search(opts={})
     term  = opts[:term]
     limit = opts[:number].to_i
+    popts = {
+      :per_page => (limit.zero? ? 20 : limit),
+      :page     => opts[:page]
+    }
 
     return [] if term.empty?
 
-    query = self.where(:quote => /#{term}/i)
-    query = query.limit(limit) unless limit.zero?
-
-    return query.all
+    return self.order(:id2).where(:quote => /#{term}/i).paginate popts
   end
 
   def self.random(opts={})

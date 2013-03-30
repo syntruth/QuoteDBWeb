@@ -19,6 +19,7 @@ class QuoteDB < Sinatra::Base
       '/js/backbone-min.js',
       '/js/backbone-stickit.js',
       '/js/coffee/application.js',
+      '/js/coffee/page_options.js',
       '/js/coffee/models/*.js',
       '/js/coffee/collections/*.js',
       '/js/coffee/views/*.js',
@@ -47,13 +48,17 @@ class QuoteDB < Sinatra::Base
     elsif params[:term]
       quotes = Quote.search(params)
     elsif params[:page]
-      opts = {:per_page => 20, :page => params[:page]}
+      number = params[:number].to_i
+      opts   = {
+        :per_page => (number.zero? ? 20 : number),
+        :page     => params[:page]
+      }
       quotes = Quote.order(:id2).paginate opts
     else
-      quotes = Quote.order(:id2).limit(20).all
+      number = params[:number].to_i
+      number = 20 if number.zero?
+      quotes = Quote.order(:id2).limit(number).all
     end
-
-    quotes.sort!
 
     if request.xhr?
       content_type :json

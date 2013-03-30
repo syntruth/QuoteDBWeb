@@ -37,20 +37,20 @@ class MainView extends Backbone.View
       icons:
         primary: 'ui-icon-circle-triangle-e'
 
+    @term       = this.$('.term')
+    @quotesEl   = this.$('.quotes-list')
     @footer     = this.$('#footer')
     @number     = this.$('.number')
     @page       = 1
     @pageNumber = this.$('.page-number')
+    @quotesList = this.$('.quotes-list')
 
     @limit = this.$('.limit').slider
-      min: 1
-      max: 20
-
-    @term = this.$('.term')
+      min:   1
+      max:   20
+      value: 20
 
     this.$el.tooltip()
-
-    @quotesEl = this.$('.quotes-list')
 
     if @quotesEl.length
       if window.quotes
@@ -64,80 +64,99 @@ class MainView extends Backbone.View
 
       @quotesView.render()
 
+    @pageOptions = new App.PageOptions
+      number:  20
+      success: (collection, reply, options) =>
+        if reply.length == 0
+          @quotes.reset options.previousModels
+          @pageOptions.decrPage()
+
+        this.setPageNumber()
+
+    @quotesList.height($(document).height() - 90)
+
+    # We monitor the window's size so we can setup the quotes
+    # list height.
+    $(window).on 'resize', this.handleResize
+
   reloadHome: (e) ->
     e.preventDefault()
 
-    @page = 1
+    @term.val     ''
+    @limit.slider 'value', 20
+    @number.text  20
 
+    @pageOptions.reset()
+
+    this.showFooter()
     this.loadPage()
 
   handleKeyPress: (e) ->
     if e.charCode is 13
-      @searchBtn.focus()
       @searchBtn.trigger 'click'
       return false
     else
       return true
 
-  loadPage: () ->
-    @quotes.fetch
-      data:
-        page: @page
-      success: (collection, reply, options) =>
-        if reply.length == 0
-          @quotes.reset options.previousModels
-          @page--
-
-        this.setPageNumber()
+  loadPage: () -> @quotes.fetch @pageOptions.current()
 
   getPrevious: (e) ->
     e.preventDefault()
 
-    @page--
+    @pageOptions.decrPage()
 
-    if @page <= 0
-      @page = 1
-    else
-      this.loadPage()
+    this.loadPage()
 
   getNext: (e) ->
     e.preventDefault()
 
-    @page++
+    @pageOptions.incrPage()
 
     this.loadPage()
 
   searchQuotes: (e) ->
     e.preventDefault()
 
-    @quotes.fetch
-      data:
-        term:   @term.val()
-        number: @number.text()
-      success: () =>
-        @page = 1
-        this.setPageNumber()
+    @pageOptions.reset()
+
+    @pageOptions.setPage   1
+    @pageOptions.setTerm   @term.val()
+    @pageOptions.setNumber @number.text()
+
+    this.showFooter()
+    this.loadPage()
 
   getRandom: (e) ->
     e.preventDefault()
 
-    data =
-      random: true
-      number: @number.text()
+    @pageOptions.reset()
+
+    @pageOptions.setRandom()
+    @pageOptions.setPage   1
+    @pageOptions.setNumber @number.text()
 
     if @term.val() isnt ''
-      data.term = @term.val()
+      @pageOptions.setTerm @term.val()
 
-    @quotes.fetch
-      data: data
-      success: () =>
-        @page = 1
-        this.setPageNumber()
+    this.hideFooter()
+    this.loadPage()
 
   setNumber: (e, ui) ->
     @number.text ui.value
+    @pageOptions.setNumber ui.value
 
   setPageNumber: () ->
-    @pageNumber.text @page
+    @pageNumber.text @pageOptions.page
+
+  hideFooter: () -> @footer.hide 'slide', direction: 'down'
+  showFooter: () -> @footer.show 'slide', direction: 'down'
+
+  handleResize: (e) =>
+    height = $(document).height() - 90
+    
+    @quotesList.height(height)
+    
+    console.log 'Got resize event...', height
+
 
 window.App.Views.MainView = MainView
