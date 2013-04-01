@@ -6,7 +6,7 @@ class PageOptions
 
   _setup: () ->
     options  = @_origOptions
-    @page    = if options.page then options.page else 1
+    @page    = options.page   or 1
     @random  = options.page   or false
     @term    = options.term   or ""
     @number  = options.number or 1
