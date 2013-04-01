@@ -73,11 +73,12 @@ class MainView extends Backbone.View
 
         this.setPageNumber()
 
-    @quotesList.height($(document).height() - 90)
-
     # We monitor the window's size so we can setup the quotes
-    # list height.
+    # list height...
     $(window).on 'resize', this.handleResize
+    
+    # ...and call it now to set the initial size.
+    this.handleResize()
 
   reloadHome: (e) ->
     e.preventDefault()
@@ -150,6 +151,6 @@ class MainView extends Backbone.View
 
   hideFooter:   () -> @footer.hide 'slide', direction: 'down'
   showFooter:   () -> @footer.show 'slide', direction: 'down'
-  handleResize: () => @quotesList.height($(document).height() - 90)
+  handleResize: () => @quotesList.height($(window).height() - 100)
 
 window.App.Views.MainView = MainView
